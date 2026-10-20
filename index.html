@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>紫微斗数排盘系统 - 电脑专业版</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>紫微斗数 · 专业排盘系统</h1>
+
+    <!-- 顶部控制与表单区 -->
+    <section class="input-section">
+      <div class="input-group" style="background: #f0f0f0; padding: 4px 8px; border: 1.5px solid #000;">
+        <label>人物选择:</label>
+        <select id="selectPerson" style="font-weight: bold;"></select>
+      </div>
+      <div class="input-group">
+        <label>姓名:</label>
+        <input type="text" id="pName">
+      </div>
+      <div class="input-group">
+        <label>阳历生日:</label>
+        <input type="date" id="pDate">
+      </div>
+      <div class="input-group">
+        <label>时间:</label>
+        <input type="time" id="pTime">
+      </div>
+      <div class="input-group">
+        <label>性别:</label>
+        <select id="pGender">
+          <option value="男">男</option>
+          <option value="女">女</option>
+        </select>
+      </div>
+      <button id="btnCalc">重新排盘</button>
+    </section>
+
+    <!-- 多重运势控制区（含新增的日运） -->
+    <section class="luck-section">
+      <div class="luck-group">
+        <label>大限:</label>
+        <select id="selectDaxian"></select>
+      </div>
+      <div class="luck-group">
+        <label>年运(流年):</label>
+        <select id="selectLiunian"></select>
+      </div>
+      <div class="luck-group">
+        <label>月运(流月):</label>
+        <select id="selectLiuyue"></select>
+      </div>
+      <div class="luck-group">
+        <label>日运(流日):</label>
+        <select id="selectRiyun"></select>
+      </div>
+    </section>
+
+    <!-- 4x4 棋盘结构 -->
+    <main class="board">
+      <div class="cell" id="cell-0"></div>
+      <div class="cell" id="cell-1"></div>
+      <div class="cell" id="cell-2"></div>
+      <div class="cell" id="cell-3"></div>
+
+      <div class="cell" id="cell-4"></div>
+      <div class="center-cell" id="centerInfo"></div>
+      <div class="cell" id="cell-5"></div>
+
+      <div class="cell" id="cell-6"></div>
+      <div class="cell" id="cell-7"></div>
+
+      <div class="cell" id="cell-8"></div>
+      <div class="cell" id="cell-9"></div>
+      <div class="cell" id="cell-10"></div>
+      <div class="cell" id="cell-11"></div>
+    </main>
+  </div>
+
+  <script src="person.js"></script>
+  <script src="dict.js"></script>
+  <script src="ziwei.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

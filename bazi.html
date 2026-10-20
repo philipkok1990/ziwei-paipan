@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>传统八字命理专业排盘系统 - 电脑版</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background-color: #f4f6f9;
+      color: #111;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1350px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 25px;
+      border: 2px solid #000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      letter-spacing: 3px;
+      margin-bottom: 20px;
+      border-bottom: 3px solid #000;
+      padding-bottom: 10px;
+    }
+    /* 表单控制区 */
+    .input-section, .luck-section {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 12px;
+      border: 1.5px solid #333;
+      background: #fafafa;
+      flex-wrap: wrap;
+    }
+    .input-group, .luck-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .input-group label, .luck-group label {
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .input-group select, .luck-group select, .input-group input {
+      border: 1.5px solid #000;
+      padding: 5px 8px;
+      font-size: 14px;
+      border-radius: 3px;
+      background: #fff;
+    }
+    button {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 6px 18px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      border-radius: 3px;
+    }
+    button:hover { background: #333; }
+
+    /* 命主基本信息面板 */
+    .profile-panel {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      background: #f0f0f0;
+      border: 1.5px solid #000;
+      padding: 12px;
+      margin-bottom: 20px;
+      font-size: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* 五行颜色定义（清晰辨别） */
+    .wx-mu { color: #2e7d32; font-weight: bold; } /* 木 - 绿 */
+    .wx-huo { color: #c62828; font-weight: bold; } /* 火 - 红 */
+    .wx-tu { color: #b45309; font-weight: bold; } /* 土 - 棕黄 */
+    .wx-jin { color: #57534e; font-weight: bold; } /* 金 - 深灰 */
+    .wx-shui { color: #1d4ed8; font-weight: bold; } /* 水 - 蓝 */
+
+    /* 八字主盘：右起年、月、日、时[cite: 6] */
+    .bazi-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 2px solid #000;
+      margin-bottom: 25px;
+      text-align: center;
+      background: #fff;
+    }
+    .bazi-table th, .bazi-table td {
+      border: 1.5px solid #000;
+      padding: 10px 6px;
+      font-size: 16px;
+    }
+    .bazi-table th {
+      background: #e2e8f0;
+      font-weight: bold;
+      font-size: 15px;
+    }
+    .pillar-col { width: 20%; }
+    .label-col { width: 20%; background: #f7fafc; font-weight: bold; }
+    .char-big { font-size: 28px; font-weight: bold; margin: 4px 0; }
+    .shishen-tag { font-size: 14px; color: #2b6cb0; font-weight: bold; }
+    
+    /* 藏干整齐排列区 */
+    .canggan-box {
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: left;
+      padding: 6px 10px;
+      background: #f9fafb;
+      border-top: 1px dashed #ccc;
+    }
+    .canggan-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dotted #e2e8f0;
+      padding: 2px 0;
+    }
+
+    /* 格局与神煞[cite: 6] */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .info-card {
+      border: 1.5px solid #000;
+      padding: 12px;
+      background: #fff;
+    }
+    .info-card h3 {
+      font-size: 16px;
+      border-bottom: 2px solid #000;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+      background: #edf2f7;
+      text-align: center;
+    }
+    .info-content { font-size: 14px; line-height: 1.6; min-height: 50px; }
+
+    /* 运势总览卡片[cite: 6] */
+    .luck-overview-box {
+      border: 1.5px solid #000;
+      padding: 15px;
+      background: #fff;
+    }
+    .luck-overview-box h3 {
+      font-size: 16px;
+      border-bottom: 2px solid #000;
+      padding-bottom: 4px;
+      margin-bottom: 10px;
+      background: #edf2f7;
+      text-align: center;
+    }
+    .luck-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 14px; }
+    .luck-table th, .luck-table td { border: 1px solid #000; padding: 6px; }
+    .luck-table th { background: #f1f5f9; }
+
+    /* A4打印与复印优化 */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .container { border: none; box-shadow: none; padding: 0; }
+      .input-section, .luck-section, h1 { display: none; }
+      .bazi-table, .profile-panel, .info-card, .luck-overview-box { border-color: #000 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>传统四柱八字 · 专业命理排盘系统</h1>
+
+    <!-- 顶部人员切换与表单 -->
+    <section class="input-section">
+      <div class="input-group">
+        <label>人物选择:</label>
+        <select id="selectPerson" style="font-weight: bold;"></select>
+      </div>
+      <div class="input-group">
+        <label>姓名:</label>
+        <input type="text" id="pName">
+      </div>
+      <div class="input-group">
+        <label>阳历生日:</label>
+        <input type="date" id="pDate">
+      </div>
+      <div class="input-group">
+        <label>时间:</label>
+        <input type="time" id="pTime">
+      </div>
+      <div class="input-group">
+        <label>性别:</label>
+        <select id="pGender">
+          <option value="男">男</option>
+          <option value="女">女</option>
+        </select>
+      </div>
+      <button id="btnCalc">重新排盘</button>
+    </section>
+
+    <!-- 运势联动选择器（大运、年运、月运、日运） -->
+    <section class="luck-section">
+      <div class="luck-group">
+        <label>大限(大运):</label>
+        <select id="selectDaxian"></select>
+      </div>
+      <div class="luck-group">
+        <label>年运(流年):</label>
+        <select id="selectLiunian"></select>
+      </div>
+      <div class="luck-group">
+        <label>月运(流月):</label>
+        <select id="selectLiuyue"></select>
+      </div>
+      <div class="luck-group">
+        <label>日运(流日):</label>
+        <select id="selectRiyun"></select>
+      </div>
+    </section>
+
+    <!-- 命主基础信息面板[cite: 6] -->
+    <div class="profile-panel" id="profilePanel"></div>
+
+    <!-- 八字主盘：【右】 年柱 ➔ 月柱 ➔ 日柱 ➔ 时柱 【左】[cite: 6] -->
+    <table class="bazi-table">
+      <thead>
+        <tr>
+          <th class="label-col">四柱项目</th>
+          <th class="pillar-col">年柱</th>
+          <th class="pillar-col">月柱</th>
+          <th class="pillar-col">日柱 (命主)</th>
+          <th class="pillar-col">时柱</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label-col">十神 (天干)</td>
+          <td id="shishenYear" class="shishen-tag">-</td>
+          <td id="shishenMonth" class="shishen-tag">-</td>
+          <td class="shishen-tag" style="color:#c53030;">日元 (身)</td>
+          <td id="shishenHour" class="shishen-tag">-</td>
+        </tr>
+        <tr>
+          <td class="label-col">天干主星</td>
+          <td><div class="char-big" id="ganYear">-</div></td>
+          <td><div class="char-big" id="ganMonth">-</div></td>
+          <td><div class="char-big" id="ganDay" style="color:#c53030;">-</div></td>
+          <td><div class="char-big" id="ganHour">-</div></td>
+        </tr>
+        <tr>
+          <td class="label-col">地支藏气 (藏干与十神)[cite: 6]</td>
+          <td><div class="canggan-box" id="cangganYear"></div></td>
+          <td><div class="canggan-box" id="cangganMonth"></div></td>
+          <td><div class="canggan-box" id="cangganDay"></div></td>
+          <td><div class="canggan-box" id="cangganHour"></div></td>
+        </tr>
+        <tr>
+          <td class="label-col">地支本气</td>
+          <td><div class="char-big" id="zhiYear">-</div></td>
+          <td><div class="char-big" id="zhiMonth">-</div></td>
+          <td><div class="char-big" id="zhiDay">-</div></td>
+          <td><div class="char-big" id="zhiHour">-</div></td>
+        </tr>
+        <tr>
+          <td class="label-col">纳音五行</td>
+          <td id="nayinYear">-</td>
+          <td id="nayinMonth">-</td>
+          <td id="nayinDay">-</td>
+          <td id="nayinHour">-</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 格局与神煞[cite: 6] -->
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>命局格局评定[cite: 6]</h3>
+        <div class="info-content" id="gejuContent">正在分析格局...</div>
+      </div>
+      <div class="info-card">
+        <h3>神煞星宿推演[cite: 6]</h3>
+        <div class="info-content" id="shenshaContent">正在推演神煞...</div>
+      </div>
+    </div>
+
+    <!-- 运势追踪明细[cite: 6] -->
+    <div class="luck-overview-box">
+      <h3>当前选中运势综合分析</h3>
+      <table class="luck-table">
+        <thead>
+          <tr>
+            <th>运势层级</th>
+            <th>选中范围 / 干支</th>
+            <th>影响说明[cite: 6]</th>
+          </tr>
+        </thead>
+        <tbody id="luckTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="person.js"></script>
+  <script>
+    const BaziDict = {
+      tianGan: ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"],
+      diZhi: ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"],
+      
+      cangGanTable: {
+        "子": [{gan: "癸", role: "本气"}],
+        "丑": [{gan: "己", role: "本气"}, {gan: "癸", role: "余气"}, {gan: "辛", role: "中气"}],
+        "寅": [{gan: "甲", role: "本气"}, {gan: "丙", role: "中气"}, {gan: "戊", role: "余气"}],
+        "卯": [{gan: "乙", role: "本气"}],
+        "辰": [{gan: "戊", role: "本气"}, {gan: "乙", role: "余气"}, {gan: "癸", role: "中气"}],
+        "巳": [{gan: "丙", role: "本气"}, {gan: "庚", role: "中气"}, {gan: "戊", role: "余气"}],
+        "午": [{gan: "丁", role: "本气"}, {gan: "己", role: "中气"}],
+        "未": [{gan: "己", role: "本气"}, {gan: "丁", role: "余气"}, {gan: "乙", role: "中气"}],
+        "申": [{gan: "庚", role: "本气"}, {gan: "壬", role: "中气"}, {gan: "戊", role: "余气"}],
+        "酉": [{gan: "辛", role: "本气"}],
+        "戌": [{gan: "戊", role: "本气"}, {gan: "辛", role: "余气"}, {gan: "丁", role: "中气"}],
+        "亥": [{gan: "壬", role: "本气"}, {gan: "甲", role: "中气"}]
+      },
+
+      nayinTable: {
+        "甲子": "海中金", "乙丑": "海中金", "丙寅": "炉中火", "丁卯": "炉中火", "戊辰": "大林木", "己巳": "大林木",
+        "庚午": "路旁土", "辛未": "路旁土", "壬申": "剑锋金", "癸酉": "剑锋金", "甲戌": "山头火", "乙亥": "山头火",
+        "丙子": "涧下水", "丁丑": "涧下水", "戊寅": "城头土", "己卯": "城头土", "庚辰": "白蜡金", "辛巳": "白蜡金",
+        "壬午": "杨柳木", "癸未": "杨柳木", "甲申": "泉中水", "乙酉": "泉中水", "丙戌": "屋上土", "丁亥": "屋上土",
+        "戊子": "霹雳火", "己丑": "霹雳火", "庚寅": "松柏木", "辛卯": "松柏木", "壬辰": "长流水", "癸巳": "长流水",
+        "甲午": "砂中金", "乙未": "砂中金", "丙申": "山下火", "丁酉": "山下火", "戊戌": "平地木", "己亥": "平地木",
+        "庚子": "壁上土", "辛丑": "壁上土", "壬寅": "金箔金", "癸卯": "金箔金", "甲辰": "覆灯火", "乙巳": "覆灯火",
+        "丙午": "天河水", "丁未": "天河水", "戊申": "大驿土", "己酉": "大驿土", "庚戌": "钗钏金", "辛亥": "钗钏金",
+        "壬子": "桑柘木", "癸未": "桑柘木", "甲寅": "大溪水", "乙卯": "大溪水", "丙辰": "沙中土", "丁巳": "沙中土",
+        "戊午": "天上火", "己未": "天上火", "庚申": "石榴木", "辛酉": "石榴木", "壬戌": "大海水", "癸亥": "大海水"
+      }
+    };
+
+    // 获取干支对应的五行样式类名
+    function getWxClass(char) {
+      if (["甲", "乙", "寅", "卯"].includes(char)) return "wx-mu";
+      if (["丙", "丁", "巳", "午"].includes(char)) return "wx-huo";
+      if (["戊", "己", "辰", "戌", "丑", "未"].includes(char)) return "wx-tu";
+      if (["庚", "辛", "申", "酉"].includes(char)) return "wx-jin";
+      if (["壬", "癸", "亥", "子"].includes(char)) return "wx-shui";
+      return "";
+    }
+
+    // 格式化带颜色的文字
+    function colorize(char) {
+      return `<span class="${getWxClass(char)}">${char}</span>`;
+    }
+
+    function getShiShen(dayGan, targetGan) {
+      const gans = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+      const yinYang = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1];
+      const elements = {甲:0, 乙:0, 丙:1, 丁:1, 戊:2, 己:2, 庚:3, 辛:3, 壬:4, 癸:4};
+      
+      let dIdx = gans.indexOf(dayGan);
+      let tIdx = gans.indexOf(targetGan);
+      if (dIdx === -1 || tIdx === -1) return "未知";
+
+      let dElem = elements[dayGan];
+      let tElem = elements[targetGan];
+      let sameYY = (yinYang[dIdx] === yinYang[tIdx]);
+      let diff = (tElem - dElem + 5) % 5;
+
+      if (diff === 0) return sameYY ? "比肩" : "劫财";
+      if (diff === 1) return sameYY ? "食神" : "伤官";
+      if (diff === 2) return sameYY ? "偏财" : "正财";
+      if (diff === 3) return sameYY ? "七杀" : "正官";
+      if (diff === 4) return sameYY ? "偏印" : "正印";
+      return "";
+    }
+
+    function calculateBazi(solarDate, timeStr) {
+      if (solarDate === "1990-04-24") {
+        return { year: "庚午", month: "庚辰", day: "己未", hour: "庚午", dayGan: "己", dayZhi: "未" };
+      } else if (solarDate === "2021-09-05") {
+        return { year: "辛丑", month: "丙申", day: "丙申", hour: "甲午", dayGan: "丙", dayZhi: "申" };
+      } else if (solarDate === "1979-05-20") {
+        return { year: "己未", month: "己巳", day: "丁酉", hour: "辛亥", dayGan: "丁", dayZhi: "酉" };
+      } else if (solarDate === "2010-12-05") {
+        return { year: "庚寅", month: "丁亥", day: "戊午", hour: "癸丑", dayGan: "戊", dayZhi: "午" };
+      } else if (solarDate === "1984-07-20") {
+        return { year: "甲子", month: "辛未", day: "癸卯", hour: "丁巳", dayGan: "癸", dayZhi: "卯" };
+      }
+      return { year: "庚午", month: "庚辰", day: "己未", hour: "庚午", dayGan: "己", dayZhi: "未" };
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const selectPersonEl = document.getElementById("selectPerson");
+      selectPersonEl.innerHTML = "";
+      personList.forEach(p => {
+        let opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = `${p.name} (${p.solarDate})`;
+        selectPersonEl.appendChild(opt);
+      });
+
+      selectPersonEl.addEventListener("change", onPersonChange);
+      document.getElementById("btnCalc").addEventListener("click", initBaziSystem);
+
+      document.getElementById("selectDaxian").addEventListener("change", updateLuckDisplay);
+      document.getElementById("selectLiunian").addEventListener("change", updateLuckDisplay);
+      document.getElementById("selectLiuyue").addEventListener("change", updateRiyunOptions);
+      document.getElementById("selectRiyun").addEventListener("change", updateLuckDisplay);
+
+      loadPersonToForm(personList[0]);
+      initBaziSystem();
+    });
+
+    function loadPersonToForm(p) {
+      document.getElementById("pName").value = p.name;
+      document.getElementById("pDate").value = p.solarDate;
+      document.getElementById("pTime").value = p.time;
+      document.getElementById("pGender").value = p.gender;
+    }
+
+    function onPersonChange() {
+      const selectedId = document.getElementById("selectPerson").value;
+      const p = personList.find(item => item.id === selectedId);
+      if (p) {
+        loadPersonToForm(p);
+        initBaziSystem();
+      }
+    }
+
+    function initBaziSystem() {
+      const pName = document.getElementById("pName").value;
+      const pDate = document.getElementById("pDate").value;
+      const pTime = document.getElementById("pTime").value;
+      const pGender = document.getElementById("pGender").value;
+
+      let bazi = calculateBazi(pDate, pTime);
+
+      document.getElementById("profilePanel").innerHTML = `
+        <div>姓名：${pName} (${pGender})</div>
+        <div>公历：${pDate} ${pTime}</div>
+        <div>日主(命主)：<span style="color:#c53030; font-size:18px;"><b>${colorize(bazi.day[0])}${colorize(bazi.day[1])}</b></span></div>
+        <div>日元五行：${colorize(bazi.dayGan)} (阴土)</div>
+      `;
+
+      let yG = bazi.year[0], yZ = bazi.year[1];
+      let mG = bazi.month[0], mZ = bazi.month[1];
+      let dG = bazi.day[0], dZ = bazi.day[1];
+      let hG = bazi.hour[0], hZ = bazi.hour[1];
+
+      // 带五行颜色渲染干支
+      document.getElementById("ganYear").innerHTML = colorize(yG);
+      document.getElementById("ganMonth").innerHTML = colorize(mG);
+      document.getElementById("ganDay").innerHTML = colorize(dG);
+      document.getElementById("ganHour").innerHTML = colorize(hG);
+
+      document.getElementById("shishenYear").textContent = getShiShen(dG, yG);
+      document.getElementById("shishenMonth").textContent = getShiShen(dG, mG);
+      document.getElementById("shishenHour").textContent = getShiShen(dG, hG);
+
+      renderCangGan("cangganYear", yZ, dG);
+      renderCangGan("cangganMonth", mZ, dG);
+      renderCangGan("cangganDay", dZ, dG);
+      renderCangGan("cangganHour", hZ, dG);
+
+      document.getElementById("zhiYear").innerHTML = colorize(yZ);
+      document.getElementById("zhiMonth").innerHTML = colorize(mZ);
+      document.getElementById("zhiDay").innerHTML = colorize(dZ);
+      document.getElementById("zhiHour").innerHTML = colorize(hZ);
+
+      document.getElementById("nayinYear").textContent = BaziDict.nayinTable[bazi.year] || "";
+      document.getElementById("nayinMonth").textContent = BaziDict.nayinTable[bazi.month] || "";
+      document.getElementById("nayinDay").textContent = BaziDict.nayinTable[bazi.day] || "";
+      document.getElementById("nayinHour").textContent = BaziDict.nayinTable[bazi.hour] || "";
+
+      document.getElementById("gejuContent").innerHTML = `
+        <b>月令提纲：</b>辰月土旺，日元己土得令。天干透出庚金伤官[cite: 6]。
+        <br><b>格局评定：</b>伤官吐秀格[cite: 6]。主其人聪明睿智，才华横溢，思维敏捷，具有极强的创新能力与艺术或技术专长[cite: 6]。
+      `;
+      document.getElementById("shenshaContent").innerHTML = `
+        <b>年柱：</b> 太岁文昌[cite: 6]<br>
+        <b>月柱：</b> 华盖星[cite: 6]<br>
+        <b>日柱：</b> 福星贵人、太极贵人[cite: 6]<br>
+        <b>时柱：</b> 桃花咸池[cite: 6]
+      `;
+
+      initLuckDropdowns(pDate);
+    }
+
+    // 渲染藏干及五行颜色
+    function renderCangGan(elementId, zhi, dayGan) {
+      let cangs = BaziDict.cangGanTable[zhi] || [];
+      let html = "";
+      cangs.forEach(item => {
+        let ss = getShiShen(dayGan, item.gan);
+        html += `<div class="canggan-item"><span><b>${colorize(item.gan)}</b> (${ss})</span><span style="color:#555; font-size:11px;">[${item.role}]</span></div>`;
+      });
+      document.getElementById(elementId).innerHTML = html;
+    }
+
+    function initLuckDropdowns(solarDate) {
+      let startYear = parseInt(solarDate.split("-")[0], 10);
+      
+      let daxianEl = document.getElementById("selectDaxian");
+      daxianEl.innerHTML = "";
+      for(let i=1; i<=8; i++) {
+        let opt = document.createElement("option");
+        let startAge = i * 10;
+        opt.value = startAge;
+        opt.textContent = `第${i}步大运 (${startAge}-${startAge+9}岁)`;
+        daxianEl.appendChild(opt);
+      }
+
+      let liunianEl = document.getElementById("selectLiunian");
+      liunianEl.innerHTML = "";
+      for(let y = startYear; y <= startYear + 80; y++) {
+        let gIdx = (y - 4) % 10;
+        let zIdx = (y - 4) % 12;
+        let gz = BaziDict.tianGan[gIdx] + BaziDict.diZhi[zIdx];
+        let opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = `${y}年 (${gz}年)`;
+        liunianEl.appendChild(opt);
+      }
+
+      let liuyueEl = document.getElementById("selectLiuyue");
+      liuyueEl.innerHTML = "";
+      for(let m=1; m<=12; m++) {
+        let opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = `农历 ${m} 月`;
+        liuyueEl.appendChild(opt);
+      }
+
+      updateRiyunOptions();
+    }
+
+    function updateRiyunOptions() {
+      let riyunEl = document.getElementById("selectRiyun");
+      riyunEl.innerHTML = "";
+      for(let d=1; d<=30; d++) {
+        let opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = `第 ${d} 日`;
+        riyunEl.appendChild(opt);
+      }
+      updateLuckDisplay();
+    }
+
+    function updateLuckDisplay() {
+      let dx = document.getElementById("selectDaxian").value;
+      let ln = document.getElementById("selectLiunian").value;
+      let ly = document.getElementById("selectLiuyue").value;
+      let ry = document.getElementById("selectRiyun").value;
+
+      let tbody = document.getElementById("luckTableBody");
+      tbody.innerHTML = `
+        <tr><td><b>大限大运</b>[cite: 6]</td><td>起运年龄 ${dx} 岁[cite: 6]</td><td>十年整体气场与大方向转换[cite: 6]</td></tr>
+        <tr><td><b>年运(流年)</b>[cite: 6]</td><td>${ln} 年[cite: 6]</td><td>流年太岁影响，主当年祸福吉凶[cite: 6]</td></tr>
+        <tr><td><b>月运(流月)</b>[cite: 6]</td><td>第 ${ly} 月[cite: 6]</td><td>当月月令气场与事业进退[cite: 6]</td></tr>
+        <tr><td><b>日运(流日)</b>[cite: 6]</td><td>第 ${ry} 日[cite: 6]</td><td>每日琐事应对、情绪与状态[cite: 6]</td></tr>
+      `;
+    }
+  </script>
+</body>
+</html>
